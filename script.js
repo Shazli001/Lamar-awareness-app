@@ -169,17 +169,30 @@ captureButton.addEventListener('click', () => {
 });
 
 analyzeImageButton.addEventListener('click', async () => {
+    console.log("Analyze Image button clicked!"); // DEBUG
+
+    // Check if there's an image on the canvas
+    if (capturedImageCanvas.style.display === 'none') {
+        console.log("No image to analyze."); // DEBUG
+        resultsText.textContent = "Please capture or upload an image to analyze.";
+        resultsText.className = "warning";
+        return; // Stop execution
+    }
+
     extractedIngredientsTextarea.value = "Analyzing...";
     try {
+        console.log("Starting OCR..."); // DEBUG
         const result = await Tesseract.recognize(
             capturedImageCanvas,
             'eng',
-            { logger: m => console.log(m) }
+            { logger: m => console.log('Tesseract Log:', m) }
         );
         const extractedText = result.data.text;
+        console.log("OCR Result:", extractedText); // DEBUG
         extractedIngredientsTextarea.value = extractedText;
         const warnings = analyzeIngredients(extractedText);
-        resultsText.textContent = getRandomAnalysisResult(warnings);
+        const analysisResult = getRandomAnalysisResult(warnings);
+        resultsText.textContent = analysisResult;
         resultsText.className = warnings.length > 0 ? "warning" : "";
     } catch (error) {
         console.error("OCR Error:", error);
