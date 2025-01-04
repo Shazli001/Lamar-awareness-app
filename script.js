@@ -4,7 +4,8 @@ const allergiesInput = document.getElementById('allergies');
 const saveProfileButton = document.getElementById('save-profile');
 const productInput = document.getElementById('product-input');
 const scanButton = document.getElementById('scan-button');
-const resultsText = document.getElementById('results-text');
+const resultsText = document.getElementById('result-message');
+const resultIcon = document.getElementById('result-icon');
 const glossaryList = document.getElementById('glossary-list');
 
 const openCameraButton = document.getElementById('open-camera-button');
@@ -13,7 +14,7 @@ const captureButton = document.getElementById('capture-button');
 const capturedImageCanvas = document.getElementById('captured-image');
 const capturedImageContext = capturedImageCanvas.getContext('2d');
 const analyzeImageButton = document.getElementById('analyze-image-button');
-const extractedIngredientsTextarea = document.getElementById('extracted-ingredients'); // Now exists
+const extractedIngredientsTextarea = document.getElementById('extracted-ingredients');
 const imageUpload = document.getElementById('image-upload');
 const allergyImageUpload = document.getElementById('allergy-image-upload');
 const allergyPreview = document.getElementById('allergy-preview');
@@ -87,24 +88,46 @@ function analyzeIngredients(productIngredients) {
 // Function to get a random analysis result
 function getRandomAnalysisResult() {
     // Randomly decide whether to show "Allergen detected!" or "No allergens detected."
-    return Math.random() < 0.5
-        ? "Allergen detected!"
-        : "No allergens detected.";
+    const isAllergenDetected = Math.random() < 0.5;
+    if (isAllergenDetected) {
+        // Pick a random allergen from the allergiesData list
+        const randomIndex = Math.floor(Math.random() * allergiesData.length);
+        const allergen = allergiesData[randomIndex].name;
+        return {
+            message: `Allergen detected! <span class="allergen-name">${allergen}</span>`,
+            isWarning: true
+        };
+    } else {
+        return {
+            message: "No allergens detected.",
+            isWarning: false
+        };
+    }
 }
 
 // Event listener for the "Scan Text" button
 scanButton.addEventListener('click', () => {
     const productText = productInput.value.trim();
     if (productText) {
-        // Extracted ingredients displayed for user reference
+        // Display extracted ingredients for user reference
         extractedIngredientsTextarea.value = productText;
 
         // Randomly display allergen result
-        resultsText.textContent = getRandomAnalysisResult();
-        resultsText.className = resultsText.textContent === "Allergen detected!" ? "warning" : "";
+        const analysisResult = getRandomAnalysisResult();
+        resultsText.innerHTML = analysisResult.message;
+        if (analysisResult.isWarning) {
+            resultsText.parentElement.classList.add("warning");
+            resultsText.parentElement.classList.remove("success");
+            resultIcon.className = "fas fa-times-circle"; // Font Awesome cross icon
+        } else {
+            resultsText.parentElement.classList.remove("warning");
+            resultsText.parentElement.classList.add("success");
+            resultIcon.className = "fas fa-check-circle"; // Font Awesome check icon
+        }
     } else {
-        resultsText.textContent = "Please enter product information or scan an image.";
-        resultsText.className = "";
+        resultsText.innerHTML = "Please enter product information or scan an image.";
+        resultsText.parentElement.classList.remove("warning", "success");
+        resultIcon.className = "";
     }
 });
 
@@ -163,8 +186,10 @@ captureButton.addEventListener('click', () => {
 analyzeImageButton.addEventListener('click', async () => {
     // Check if there's an image on the canvas
     if (capturedImageCanvas.style.display === 'none') {
-        resultsText.textContent = "Please capture or upload an image to analyze.";
-        resultsText.className = "warning";
+        resultsText.innerHTML = "Please capture or upload an image to analyze.";
+        resultsText.parentElement.classList.add("warning");
+        resultsText.parentElement.classList.remove("success");
+        resultIcon.className = "fas fa-times-circle"; // Font Awesome cross icon
         return; // Stop execution
     }
 
@@ -180,13 +205,24 @@ analyzeImageButton.addEventListener('click', async () => {
         extractedIngredientsTextarea.value = extractedText;
 
         // Randomly display allergen result
-        resultsText.textContent = getRandomAnalysisResult();
-        resultsText.className = resultsText.textContent === "Allergen detected!" ? "warning" : "";
+        const analysisResult = getRandomAnalysisResult();
+        resultsText.innerHTML = analysisResult.message;
+        if (analysisResult.isWarning) {
+            resultsText.parentElement.classList.add("warning");
+            resultsText.parentElement.classList.remove("success");
+            resultIcon.className = "fas fa-times-circle"; // Font Awesome cross icon
+        } else {
+            resultsText.parentElement.classList.remove("warning");
+            resultsText.parentElement.classList.add("success");
+            resultIcon.className = "fas fa-check-circle"; // Font Awesome check icon
+        }
     } catch (error) {
         console.error("OCR Error:", error);
         extractedIngredientsTextarea.value = "Error during OCR. Please try again.";
-        resultsText.textContent = "Image analysis failed. Ensure the label is clear.";
-        resultsText.className = "warning";
+        resultsText.innerHTML = "Image analysis failed. Ensure the label is clear.";
+        resultsText.parentElement.classList.add("warning");
+        resultsText.parentElement.classList.remove("success");
+        resultIcon.className = "fas fa-times-circle"; // Font Awesome cross icon
     }
 });
 
