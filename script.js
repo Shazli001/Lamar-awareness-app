@@ -13,8 +13,14 @@ const capturedImageContext = capturedImageCanvas.getContext('2d');
 const analyzeImageButton = document.getElementById('analyze-image-button');
 const extractedIngredientsTextarea = document.getElementById('extracted-ingredients');
 const imageUpload = document.getElementById('image-upload');
+const allergyImageUpload = document.getElementById('allergy-image-upload');
+const allergyPreview = document.getElementById('allergy-preview');
+
+const randomAllergyName = document.getElementById('random-allergy-name');
+const randomAllergyDefinition = document.getElementById('random-allergy-definition');
 
 let userAllergies = [];
+let allergyImageText = null; // To store text extracted from allergy image
 
 // Load profile from local storage if available
 const storedAllergies = localStorage.getItem('allergies');
@@ -29,11 +35,29 @@ const ingredientGlossary = {
     "gluten": "A protein found in wheat, barley, and rye.",
     "dairy": "Products containing milk.",
     "artificial colors": "Synthetic dyes added to food.",
-    "soy": "Derived from soybeans, a common allergen."
+    "soy": "Derived from soybeans, a common allergen.",
+    "shellfish": "Aquatic invertebrates used as food, can cause severe allergies."
 };
 
+const allergiesData = [
+    { name: "Peanuts", definition: "A common food allergen that can cause severe reactions." },
+    { name: "Milk", definition: "Dairy products contain lactose, which some people are intolerant to." },
+    { name: "Eggs", definition: "A frequent cause of food allergies, especially in children." },
+    { name: "Tree Nuts", definition: "Includes almonds, walnuts, cashews, etc., and can cause severe allergies." },
+    { name: "Soy", definition: "A legume that is a common food allergen." },
+    { name: "Wheat", definition: "Contains gluten, which can be problematic for people with celiac disease." },
+    { name: "Fish", definition: "Certain types of fish can trigger allergic reactions." },
+    { name: "Shellfish", definition: "Includes crustaceans like shrimp and crab, common allergens." }
+];
+
+function displayRandomAllergy() {
+    const randomIndex = Math.floor(Math.random() * allergiesData.length);
+    randomAllergyName.textContent = allergiesData[randomIndex].name;
+    randomAllergyDefinition.textContent = allergiesData[randomIndex].definition;
+}
+
 // Function to check ingredients against allergies
-function analyzeIngredients(productIngredients) {
+async function analyzeIngredients(productIngredients) {
     let isSafe = true;
     let warnings = [];
 
@@ -45,6 +69,13 @@ function analyzeIngredients(productIngredients) {
             warnings.push(`Warning: May contain ${allergy}.`);
         }
     });
+
+    if (allergyImageText) {
+        if (lowerCaseIngredients.includes(allergyImageText.toLowerCase())) {
+            isSafe = false;
+            warnings.push(`Warning: May contain ingredients similar to your uploaded allergy image.`);
+        }
+    }
 
     for (const ingredient in ingredientGlossary) {
         if (lowerCaseIngredients.includes(ingredient.toLowerCase())) {
@@ -158,3 +189,31 @@ imageUpload.addEventListener('change', (event) => {
         reader.readAsDataURL(file);
     }
 });
+
+allergyImageUpload.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        allergyPreview.src = URL.createObjectURL(file);
+        allergyPreview.style.display = 'block';
+
+        try {
+            const result = await Tesseract.recognize(
+                file,
+                'eng',
+                { logger: m => console.log(m) }
+            );
+            allergyImageText = result.data.text;
+            alert("Allergy image analyzed. We'll check for similar ingredients.");
+        } catch (error) {
+            console.error("OCR Error on allergy image:", error);
+            alert("Error analyzing allergy image. Please try again.");
+            allergyImageText = null;
+        }
+    } else {
+        allergyPreview.src = "#";
+        allergyPreview.style.display = 'none';
+        allergyImageText = null;
+    }
+});
+
+displayRandomAllergy(); // Display a random allergy on page load
