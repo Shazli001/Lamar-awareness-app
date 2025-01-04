@@ -12,8 +12,15 @@
 
     <div id="profile-area">
         <h2>Your Profile</h2>
-        <label for="allergies">Allergies/Sensitivities:</label>
-        <input type="text" id="allergies" placeholder="e.g., nuts, dairy, gluten">
+        <div>
+            <label for="allergies">Known Allergies/Sensitivities (Text):</label>
+            <input type="text" id="allergies" placeholder="e.g., nuts, dairy, gluten">
+        </div>
+        <div>
+            <label for="allergy-image-upload">Allergy Image (Upload):</label>
+            <input type="file" id="allergy-image-upload" accept="image/*">
+            <img id="allergy-preview" src="#" alt="Uploaded Allergy Image" style="display: none; max-width: 100px; max-height: 100px;">
+        </div>
         <button id="save-profile">Save Profile</button>
     </div>
 
@@ -41,11 +48,21 @@
         <p id="results-text"></p>
     </div>
 
+    <div id="random-allergy-area">
+        <h2>Random Allergy Fact</h2>
+        <p>Did you know?</p>
+        <p><span id="random-allergy-name" style="font-weight: bold;"></span>: <span id="random-allergy-definition"></span></p>
+    </div>
+
     <div id="glossary-area">
         <h2>Ingredient Glossary</h2>
         <ul id="glossary-list">
         </ul>
     </div>
+
+    <footer>
+        <p>© Copyright Made by Lamar Ahmed Amer 2025</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
