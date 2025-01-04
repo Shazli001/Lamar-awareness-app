@@ -85,8 +85,8 @@ function analyzeIngredients(productIngredients) {
 }
 
 // Function to get a random analysis result
-function getRandomAnalysisResult(warnings) {
-    // Randomly decide whether to show "Allergen detected" or "No allergens detected"
+function getRandomAnalysisResult() {
+    // Randomly decide whether to show "Allergen detected!" or "No allergens detected."
     return Math.random() < 0.5
         ? "Allergen detected!"
         : "No allergens detected.";
@@ -94,12 +94,14 @@ function getRandomAnalysisResult(warnings) {
 
 // Event listener for the "Scan Text" button
 scanButton.addEventListener('click', () => {
-    const productText = productInput.value;
+    const productText = productInput.value.trim();
     if (productText) {
-        const warnings = analyzeIngredients(productText);
-        // Use random result instead of actual analysis
-        resultsText.textContent = getRandomAnalysisResult(warnings);
-        resultsText.className = warnings.length > 0 ? "warning" : "";
+        // Extracted ingredients displayed for user reference
+        extractedIngredientsTextarea.value = productText;
+
+        // Randomly display allergen result
+        resultsText.textContent = getRandomAnalysisResult();
+        resultsText.className = resultsText.textContent === "Allergen detected!" ? "warning" : "";
     } else {
         resultsText.textContent = "Please enter product information or scan an image.";
         resultsText.className = "";
@@ -159,39 +161,31 @@ captureButton.addEventListener('click', () => {
 });
 
 analyzeImageButton.addEventListener('click', async () => {
-    console.log("Analyze Image button clicked!"); // DEBUG
-
-    // Immediately display a random message
-    resultsText.className = ""; // Clear any previous warning class
-    resultsText.textContent = Math.random() < 0.7 ? "Analyzing for potential allergens..." : "Checking ingredients for safety...";
-
     // Check if there's an image on the canvas
     if (capturedImageCanvas.style.display === 'none') {
-        console.log("No image to analyze."); // DEBUG
         resultsText.textContent = "Please capture or upload an image to analyze.";
         resultsText.className = "warning";
         return; // Stop execution
     }
 
     extractedIngredientsTextarea.value = "Analyzing...";
+
     try {
-        console.log("Starting OCR..."); // DEBUG
         const result = await Tesseract.recognize(
             capturedImageCanvas,
             'eng',
             { logger: m => console.log('Tesseract Log:', m) }
         );
-        const extractedText = result.data.text;
-        console.log("OCR Result:", extractedText); // DEBUG
+        const extractedText = result.data.text.trim();
         extractedIngredientsTextarea.value = extractedText;
-        const warnings = analyzeIngredients(extractedText);
-        const analysisResult = getRandomAnalysisResult(warnings);
-        resultsText.textContent = analysisResult;
-        resultsText.className = warnings.length > 0 ? "warning" : "";
+
+        // Randomly display allergen result
+        resultsText.textContent = getRandomAnalysisResult();
+        resultsText.className = resultsText.textContent === "Allergen detected!" ? "warning" : "";
     } catch (error) {
         console.error("OCR Error:", error);
         extractedIngredientsTextarea.value = "Error during OCR. Please try again.";
-        resultsText.textContent = Math.random() < 0.5 ? "Could not analyze the image, please try again." : "Image analysis failed. Ensure the label is clear.";
+        resultsText.textContent = "Image analysis failed. Ensure the label is clear.";
         resultsText.className = "warning";
     }
 });
@@ -227,7 +221,7 @@ allergyImageUpload.addEventListener('change', async (event) => {
                 'eng',
                 { logger: m => console.log(m) }
             );
-            allergyImageText = result.data.text;
+            allergyImageText = result.data.text.trim();
             alert("Allergy image analyzed. We'll check for similar ingredients.");
         } catch (error) {
             console.error("OCR Error on allergy image:", error);
