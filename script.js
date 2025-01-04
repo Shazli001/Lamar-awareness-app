@@ -91,12 +91,12 @@ function getRandomAnalysisResult(warnings) {
             const randomWarningIndex = Math.floor(Math.random() * warnings.length);
             return `Allergen detected! You might be allergic to: ${warnings[randomWarningIndex]}.`;
         } else {
-            return `No new allergens strongly detected, but be cautious of: ${warnings.join(', ')}.`;
+            return `Potential allergens detected: ${warnings.join(', ')}. Be cautious!`;
         }
     } else {
         // Less likely to show an alert if no allergens are found
-        if (randomNumber < 0.2) { // 20% chance of a "false positive" or general advice
-            return "No specific allergens detected, but always check the label.";
+        if (randomNumber < 0.3) { // Increased chance of a "false positive" or general advice
+            return "No specific allergens strongly detected, but always double-check!";
         } else {
             return "No allergens detected. You should be safe.";
         }
@@ -171,6 +171,10 @@ captureButton.addEventListener('click', () => {
 analyzeImageButton.addEventListener('click', async () => {
     console.log("Analyze Image button clicked!"); // DEBUG
 
+    // Immediately display a random message
+    resultsText.className = ""; // Clear any previous warning class
+    resultsText.textContent = Math.random() < 0.7 ? "Analyzing for potential allergens..." : "Checking ingredients for safety...";
+
     // Check if there's an image on the canvas
     if (capturedImageCanvas.style.display === 'none') {
         console.log("No image to analyze."); // DEBUG
@@ -197,7 +201,7 @@ analyzeImageButton.addEventListener('click', async () => {
     } catch (error) {
         console.error("OCR Error:", error);
         extractedIngredientsTextarea.value = "Error during OCR. Please try again.";
-        resultsText.textContent = "Error analyzing image.";
+        resultsText.textContent = Math.random() < 0.5 ? "Could not analyze the image, please try again." : "Image analysis failed. Ensure the label is clear.";
         resultsText.className = "warning";
     }
 });
