@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health & Safety Scanner</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tesseract.js for OCR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
 </head>
 <body>
@@ -52,8 +56,11 @@
 
         <section id="results-area" class="card">
             <h2>Analysis Results</h2>
-            <p id="results-text"></p>
-            <!-- Added extracted-ingredients textarea -->
+            <p id="results-text">
+                <i id="result-icon" class=""></i>
+                <span id="result-message"></span>
+            </p>
+            <!-- Extracted ingredients textarea -->
             <textarea id="extracted-ingredients" placeholder="Extracted ingredients will appear here..." readonly></textarea>
         </section>
 
