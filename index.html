@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health & Safety Scanner</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
+</head>
+<body>
+    <h1>Health & Safety Scanner</h1>
+
+    <div id="profile-area">
+        <h2>Your Profile</h2>
+        <label for="allergies">Allergies/Sensitivities:</label>
+        <input type="text" id="allergies" placeholder="e.g., nuts, dairy, gluten">
+        <button id="save-profile">Save Profile</button>
+    </div>
+
+    <div id="scan-area">
+        <h2>Scan Product</h2>
+        <p>Scan a product label using your camera or upload an image:</p>
+
+        <button id="open-camera-button">Open Camera</button>
+        <video id="camera-view" width="320" height="240" style="display: none;"></video>
+        <button id="capture-button" style="display: none;">Capture Image</button>
+
+        <input type="file" id="image-upload" accept="image/*"> <br><br>
+
+        <canvas id="captured-image" width="320" height="240" style="display: none;"></canvas>
+
+        <button id="analyze-image-button" style="display: none;">Analyze Image</button>
+
+        <p>Or, enter product name or ingredients manually:</p>
+        <textarea id="product-input" placeholder="Enter product name or ingredients"></textarea>
+        <button id="scan-button">Analyze Text</button>
+    </div>
+
+    <div id="results-area">
+        <h2>Analysis Results</h2>
+        <p id="results-text"></p>
+    </div>
+
+    <div id="glossary-area">
+        <h2>Ingredient Glossary</h2>
+        <ul id="glossary-list">
+        </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
