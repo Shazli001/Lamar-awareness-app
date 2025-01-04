@@ -94,6 +94,7 @@ main {
     box-sizing: border-box;
     resize: none;
     height: 100px;
+    background-color: #f9f9f9;
 }
 
 .primary-button {
@@ -129,6 +130,7 @@ main {
 
 .scan-options {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 15px;
 }
