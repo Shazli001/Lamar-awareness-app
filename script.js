@@ -1,3 +1,5 @@
+// script.js
+
 const allergiesInput = document.getElementById('allergies');
 const saveProfileButton = document.getElementById('save-profile');
 const productInput = document.getElementById('product-input');
@@ -11,7 +13,7 @@ const captureButton = document.getElementById('capture-button');
 const capturedImageCanvas = document.getElementById('captured-image');
 const capturedImageContext = capturedImageCanvas.getContext('2d');
 const analyzeImageButton = document.getElementById('analyze-image-button');
-const extractedIngredientsTextarea = document.getElementById('extracted-ingredients');
+const extractedIngredientsTextarea = document.getElementById('extracted-ingredients'); // Now exists
 const imageUpload = document.getElementById('image-upload');
 const allergyImageUpload = document.getElementById('allergy-image-upload');
 const allergyPreview = document.getElementById('allergy-preview');
@@ -82,25 +84,12 @@ function analyzeIngredients(productIngredients) {
     return warnings;
 }
 
+// Function to get a random analysis result
 function getRandomAnalysisResult(warnings) {
-    const randomNumber = Math.random();
-
-    if (warnings.length > 0) {
-        // More likely to show an alert if allergens are found
-        if (randomNumber < 0.8) { // 80% chance of showing an alert
-            const randomWarningIndex = Math.floor(Math.random() * warnings.length);
-            return `Allergen detected! You might be allergic to: ${warnings[randomWarningIndex]}.`;
-        } else {
-            return `Potential allergens detected: ${warnings.join(', ')}. Be cautious!`;
-        }
-    } else {
-        // Less likely to show an alert if no allergens are found
-        if (randomNumber < 0.3) { // Increased chance of a "false positive" or general advice
-            return "No specific allergens strongly detected, but always double-check!";
-        } else {
-            return "No allergens detected. You should be safe.";
-        }
-    }
+    // Randomly decide whether to show "Allergen detected" or "No allergens detected"
+    return Math.random() < 0.5
+        ? "Allergen detected!"
+        : "No allergens detected.";
 }
 
 // Event listener for the "Scan Text" button
@@ -108,6 +97,7 @@ scanButton.addEventListener('click', () => {
     const productText = productInput.value;
     if (productText) {
         const warnings = analyzeIngredients(productText);
+        // Use random result instead of actual analysis
         resultsText.textContent = getRandomAnalysisResult(warnings);
         resultsText.className = warnings.length > 0 ? "warning" : "";
     } else {
