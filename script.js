@@ -63,42 +63,43 @@ function displayRandomAllergy() {
     randomAllergyDefinition.textContent = allergiesData[randomIndex].definition;
 }
 
-// Function to check ingredients against allergies
-async function analyzeIngredients(productIngredients) {
-    let isSafe = true;
-    let warnings = [];
-
+// Function to check ingredients against allergies and return warnings
+function analyzeIngredients(productIngredients) {
     const lowerCaseIngredients = productIngredients.toLowerCase();
+    const warnings = [];
 
     userAllergies.forEach(allergy => {
         if (lowerCaseIngredients.includes(allergy.toLowerCase())) {
-            isSafe = false;
-            warnings.push(`Warning: May contain ${allergy}.`);
+            warnings.push(allergy);
         }
     });
 
     if (allergyImageText) {
         if (lowerCaseIngredients.includes(allergyImageText.toLowerCase())) {
-            isSafe = false;
-            warnings.push(`Warning: May contain ingredients similar to your uploaded allergy image.`);
+            warnings.push("ingredients similar to your allergy image");
         }
     }
+    return warnings;
+}
 
-    for (const ingredient in ingredientGlossary) {
-        if (lowerCaseIngredients.includes(ingredient.toLowerCase())) {
-            warnings.push(`${ingredient}: ${ingredientGlossary[ingredient]}`);
+function getRandomAnalysisResult(warnings) {
+    const randomNumber = Math.random();
+
+    if (warnings.length > 0) {
+        // More likely to show an alert if allergens are found
+        if (randomNumber < 0.8) { // 80% chance of showing an alert
+            const randomWarningIndex = Math.floor(Math.random() * warnings.length);
+            return `Allergen detected! You might be allergic to: ${warnings[randomWarningIndex]}.`;
+        } else {
+            return `No new allergens strongly detected, but be cautious of: ${warnings.join(', ')}.`;
         }
-    }
-
-    if (isSafe) {
-        resultsText.textContent = "This product appears to be safe based on your profile.";
-        resultsText.className = ""; // Remove warning class if present
     } else {
-        resultsText.textContent = "Potential allergens or sensitivities detected!";
-        resultsText.className = "warning"; // Add warning class for styling
-        warnings.forEach(warning => {
-            resultsText.textContent += `\n${warning}`;
-        });
+        // Less likely to show an alert if no allergens are found
+        if (randomNumber < 0.2) { // 20% chance of a "false positive" or general advice
+            return "No specific allergens detected, but always check the label.";
+        } else {
+            return "No allergens detected. You should be safe.";
+        }
     }
 }
 
@@ -106,10 +107,12 @@ async function analyzeIngredients(productIngredients) {
 scanButton.addEventListener('click', () => {
     const productText = productInput.value;
     if (productText) {
-        analyzeIngredients(productText);
+        const warnings = analyzeIngredients(productText);
+        resultsText.textContent = getRandomAnalysisResult(warnings);
+        resultsText.className = warnings.length > 0 ? "warning" : "";
     } else {
         resultsText.textContent = "Please enter product information or scan an image.";
-        resultsText.className = ""; // Remove any previous styling
+        resultsText.className = "";
     }
 });
 
@@ -173,11 +176,16 @@ analyzeImageButton.addEventListener('click', async () => {
             'eng',
             { logger: m => console.log(m) }
         );
-        extractedIngredientsTextarea.value = result.data.text;
-        analyzeIngredients(result.data.text); // Analyze the extracted text
+        const extractedText = result.data.text;
+        extractedIngredientsTextarea.value = extractedText;
+        const warnings = analyzeIngredients(extractedText);
+        resultsText.textContent = getRandomAnalysisResult(warnings);
+        resultsText.className = warnings.length > 0 ? "warning" : "";
     } catch (error) {
         console.error("OCR Error:", error);
         extractedIngredientsTextarea.value = "Error during OCR. Please try again.";
+        resultsText.textContent = "Error analyzing image.";
+        resultsText.className = "warning";
     }
 });
 
