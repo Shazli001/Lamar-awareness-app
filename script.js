@@ -36,7 +36,8 @@ const ingredientGlossary = {
     "dairy": "Products containing milk.",
     "artificial colors": "Synthetic dyes added to food.",
     "soy": "Derived from soybeans, a common allergen.",
-    "shellfish": "Aquatic invertebrates used as food, can cause severe allergies."
+    "shellfish": "Aquatic invertebrates used as food, can cause severe allergies.",
+    "sesame": "Seeds that are an increasingly recognized allergen."
 };
 
 const allergiesData = [
@@ -47,7 +48,13 @@ const allergiesData = [
     { name: "Soy", definition: "A legume that is a common food allergen." },
     { name: "Wheat", definition: "Contains gluten, which can be problematic for people with celiac disease." },
     { name: "Fish", definition: "Certain types of fish can trigger allergic reactions." },
-    { name: "Shellfish", definition: "Includes crustaceans like shrimp and crab, common allergens." }
+    { name: "Shellfish", definition: "Includes crustaceans like shrimp and crab, common allergens." },
+    { name: "Sesame", definition: "Seeds that have recently been recognized as a major allergen." },
+    { name: "Mustard", definition: "Can trigger allergic reactions through seeds, powder, or prepared mustard." },
+    { name: "Celery", definition: "The stalk, leaves, seeds, and root can cause allergic reactions." },
+    { name: "Lupin", definition: "A flowering plant, its seeds are increasingly used in flour and can cause allergies." },
+    { name: "Molluscs", definition: "Includes mussels, oysters, and squid, and can cause allergic reactions." },
+    { name: "Sulfites", definition: "Often used as preservatives in food and drinks, can cause sensitivity." }
 ];
 
 function displayRandomAllergy() {
@@ -85,8 +92,10 @@ async function analyzeIngredients(productIngredients) {
 
     if (isSafe) {
         resultsText.textContent = "This product appears to be safe based on your profile.";
+        resultsText.className = ""; // Remove warning class if present
     } else {
         resultsText.textContent = "Potential allergens or sensitivities detected!";
+        resultsText.className = "warning"; // Add warning class for styling
         warnings.forEach(warning => {
             resultsText.textContent += `\n${warning}`;
         });
@@ -100,6 +109,7 @@ scanButton.addEventListener('click', () => {
         analyzeIngredients(productText);
     } else {
         resultsText.textContent = "Please enter product information or scan an image.";
+        resultsText.className = ""; // Remove any previous styling
     }
 });
 
